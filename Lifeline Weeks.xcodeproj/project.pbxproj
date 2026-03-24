@@ -6,14 +6,66 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0DF63C232F724238001F745F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DF63C222F724238001F745F /* WidgetKit.framework */; };
+		0DF63C252F724238001F745F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DF63C242F724238001F745F /* SwiftUI.framework */; };
+		0DF63C362F724239001F745F /* LifelineWeekExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0DF63C202F724238001F745F /* LifelineWeekExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0DF63C342F724239001F745F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0D2B24932F72320B0057769D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0DF63C1F2F724238001F745F;
+			remoteInfo = LifelineWeekExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0DF63C3B2F724239001F745F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0DF63C362F724239001F745F /* LifelineWeekExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		0D2B249B2F72320B0057769D /* Lifeline Weeks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lifeline Weeks.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0DF63C202F724238001F745F /* LifelineWeekExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LifelineWeekExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		0DF63C222F724238001F745F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		0DF63C242F724238001F745F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		0DF63C452F724930001F745F /* LifelineWeekExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LifelineWeekExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0DF63C372F724239001F745F /* Exceptions for "LifelineWeek" folder in "LifelineWeekExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0DF63C1F2F724238001F745F /* LifelineWeekExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0D2B249D2F72320B0057769D /* Lifeline Weeks */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Lifeline Weeks";
+			sourceTree = "<group>";
+		};
+		0DF63C262F724238001F745F /* LifelineWeek */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0DF63C372F724239001F745F /* Exceptions for "LifelineWeek" folder in "LifelineWeekExtension" target */,
+			);
+			path = LifelineWeek;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,13 +78,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0DF63C1D2F724238001F745F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0DF63C252F724238001F745F /* SwiftUI.framework in Frameworks */,
+				0DF63C232F724238001F745F /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0D2B24922F72320B0057769D = {
 			isa = PBXGroup;
 			children = (
+				0DF63C452F724930001F745F /* LifelineWeekExtension.entitlements */,
 				0D2B249D2F72320B0057769D /* Lifeline Weeks */,
+				0DF63C262F724238001F745F /* LifelineWeek */,
+				0DF63C212F724238001F745F /* Frameworks */,
 				0D2B249C2F72320B0057769D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +105,18 @@
 			isa = PBXGroup;
 			children = (
 				0D2B249B2F72320B0057769D /* Lifeline Weeks.app */,
+				0DF63C202F724238001F745F /* LifelineWeekExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0DF63C212F724238001F745F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0DF63C222F724238001F745F /* WidgetKit.framework */,
+				0DF63C242F724238001F745F /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +129,12 @@
 				0D2B24972F72320B0057769D /* Sources */,
 				0D2B24982F72320B0057769D /* Frameworks */,
 				0D2B24992F72320B0057769D /* Resources */,
+				0DF63C3B2F724239001F745F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0DF63C352F724239001F745F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				0D2B249D2F72320B0057769D /* Lifeline Weeks */,
@@ -69,6 +145,28 @@
 			productName = "Lifeline Weeks";
 			productReference = 0D2B249B2F72320B0057769D /* Lifeline Weeks.app */;
 			productType = "com.apple.product-type.application";
+		};
+		0DF63C1F2F724238001F745F /* LifelineWeekExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0DF63C382F724239001F745F /* Build configuration list for PBXNativeTarget "LifelineWeekExtension" */;
+			buildPhases = (
+				0DF63C1C2F724238001F745F /* Sources */,
+				0DF63C1D2F724238001F745F /* Frameworks */,
+				0DF63C1E2F724238001F745F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0DF63C262F724238001F745F /* LifelineWeek */,
+			);
+			name = LifelineWeekExtension;
+			packageProductDependencies = (
+			);
+			productName = LifelineWeekExtension;
+			productReference = 0DF63C202F724238001F745F /* LifelineWeekExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +179,9 @@
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					0D2B249A2F72320B0057769D = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
+					0DF63C1F2F724238001F745F = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
 				};
@@ -100,12 +201,20 @@
 			projectRoot = "";
 			targets = (
 				0D2B249A2F72320B0057769D /* Lifeline Weeks */,
+				0DF63C1F2F724238001F745F /* LifelineWeekExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		0D2B24992F72320B0057769D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0DF63C1E2F724238001F745F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +231,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0DF63C1C2F724238001F745F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0DF63C352F724239001F745F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0DF63C1F2F724238001F745F /* LifelineWeekExtension */;
+			targetProxy = 0DF63C342F724239001F745F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		0D2B24A42F72320C0057769D /* Debug */ = {
@@ -251,16 +375,20 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = "Lifeline Weeks/Lifeline Weeks.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 553U32259K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -283,16 +411,20 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = "Lifeline Weeks/Lifeline Weeks.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 553U32259K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -303,6 +435,70 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		0DF63C392F724239001F745F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LifelineWeekExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 553U32259K;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LifelineWeek/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LifelineWeek;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.SamCorp.Lifeline-Weeks.LifelineWeek";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0DF63C3A2F724239001F745F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LifelineWeekExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 553U32259K;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LifelineWeek/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LifelineWeek;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.SamCorp.Lifeline-Weeks.LifelineWeek";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -327,6 +523,15 @@
 			buildConfigurations = (
 				0D2B24A72F72320C0057769D /* Debug */,
 				0D2B24A82F72320C0057769D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0DF63C382F724239001F745F /* Build configuration list for PBXNativeTarget "LifelineWeekExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0DF63C392F724239001F745F /* Debug */,
+				0DF63C3A2F724239001F745F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
