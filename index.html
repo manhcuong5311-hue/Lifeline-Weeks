@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lifeline Weeks — Legal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e6e1;
+      --muted: #7a7880;
+      --accent: #4a90d9;
+      --gold: #c9a84c;
+      --week-live: rgba(74,144,217,0.85);
+      --week-future: rgba(255,255,255,0.06);
+      --week-current: #4a90d9;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo {
+      width: 32px; height: 32px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+    }
+
+    .nav-logo span {
+      border-radius: 1px;
+      background: var(--week-future);
+    }
+    .nav-logo span:nth-child(-n+12) { background: var(--week-live); opacity: 0.7; }
+    .nav-logo span:nth-child(13) {
+      background: var(--week-current);
+      box-shadow: 0 0 4px var(--week-current);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .nav-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex; gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 7rem 2rem 5rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Animated week-grid background */
+    .hero-grid {
+      position: absolute; inset: 0;
+      display: flex; flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 3px;
+      padding: 2rem;
+      opacity: 0.15;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .hero-grid-cell {
+      width: 8px; height: 8px;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+
+    .hero-grid-cell.lived { background: var(--accent); }
+    .hero-grid-cell.current {
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .hero-grid-cell.future { background: rgba(255,255,255,0.15); }
+    .hero-grid-cell.milestone { border: 1px solid var(--gold); }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(74,144,217,0.3);
+      padding: 0.3rem 0.9rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 440px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-tabs {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .hero-tab {
+      padding: 0.5rem 1.4rem;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      transition: all 0.25s;
+      background: transparent;
+      color: var(--muted);
+    }
+    .hero-tab.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    .section { display: none; animation: fadeUp 0.4s ease; }
+    .section.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Doc header ── */
+    .doc-header {
+      padding: 2.5rem 0 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .doc-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+
+    .doc-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ── Content blocks ── */
+    .doc-section {
+      margin-bottom: 3rem;
+    }
+
+    .doc-section h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+
+    .doc-section h3 .num {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      background: rgba(74,144,217,0.1);
+      padding: 0.15rem 0.5rem;
+      border-radius: 100px;
+    }
+
+    .doc-section p {
+      color: #b0adb8;
+      font-size: 0.95rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .doc-section ul {
+      padding-left: 0;
+      list-style: none;
+      margin-bottom: 0.9rem;
+    }
+
+    .doc-section ul li {
+      color: #b0adb8;
+      font-size: 0.95rem;
+      padding: 0.35rem 0 0.35rem 1.4rem;
+      position: relative;
+    }
+
+    .doc-section ul li::before {
+      content: '—';
+      position: absolute; left: 0;
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
+    .highlight-box {
+      background: rgba(74,144,217,0.06);
+      border: 1px solid rgba(74,144,217,0.2);
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      margin: 1.2rem 0;
+      font-size: 0.9rem;
+      color: #9ecbf5;
+    }
+
+    .highlight-box strong { color: var(--accent); }
+
+    .warn-box {
+      background: rgba(201,168,76,0.06);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      margin: 1.2rem 0;
+      font-size: 0.9rem;
+      color: #e0c97a;
+    }
+
+    /* ── Contact card ── */
+    .contact-card {
+      margin-top: 3rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-card-left h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 0.3rem;
+    }
+
+    .contact-card-left p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+    .contact-link:hover { opacity: 0.8; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero { padding: 5rem 1.5rem 3rem; }
+      .contact-card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div class="nav-logo" id="navLogo"></div>
+    <span class="nav-brand-name">Lifeline Weeks</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="switchTab('privacy')">Privacy Policy</a></li>
+    <li><a href="#" onclick="switchTab('terms')">Terms of Use</a></li>
+    <li><a href="mailto:Manhcuong531@gmail.com">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-grid" id="heroGrid"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Legal Documents</span>
+    <h1>Designed with<br/><em>your trust</em> in mind</h1>
+    <p class="hero-sub">Lifeline Weeks stores all data locally on your device. No accounts. No servers. No tracking.</p>
+    <div class="hero-tabs">
+      <button class="hero-tab active" id="tab-privacy" onclick="switchTab('privacy')">Privacy Policy</button>
+      <button class="hero-tab" id="tab-terms" onclick="switchTab('terms')">Terms of Use</button>
+    </div>
+  </div>
+</section>
+
+<!-- Main content -->
+<div class="container">
+
+  <!-- ═══════════════════════════════ PRIVACY POLICY ═══════════════════════════════ -->
+  <div class="section active" id="section-privacy">
+    <div class="doc-header">
+      <h2>Privacy Policy</h2>
+      <p class="doc-meta">Effective date: March 24, 2026 &nbsp;·&nbsp; Lifeline Weeks iOS App</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">01</span> Overview</h3>
+      <p>Lifeline Weeks ("the App", "we", "our") is an iOS application developed by Cuong Sam Manh. We are deeply committed to your privacy. This policy explains clearly and completely what data the App uses, where it stays, and what rights you have.</p>
+      <div class="highlight-box">
+        <strong>Short version:</strong> All data you enter — including your birthday and life expectancy — is stored exclusively on your device. We do not collect, transmit, sell, or share any personal information. There are no servers, no accounts, and no analytics.
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">02</span> Information We Do Not Collect</h3>
+      <p>Lifeline Weeks does not collect, store remotely, or transmit any of the following:</p>
+      <ul>
+        <li>Your name, email address, or any contact information</li>
+        <li>Your date of birth or life expectancy setting</li>
+        <li>Location data of any kind</li>
+        <li>Device identifiers, advertising IDs, or IP addresses</li>
+        <li>Usage analytics, crash logs sent to third parties, or behavioral data</li>
+        <li>Any data from your contacts, camera, microphone, or photo library</li>
+      </ul>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">03</span> Data Stored Locally on Your Device</h3>
+      <p>The following information is stored only on your device using iOS system storage (UserDefaults and App Group container shared with the widget):</p>
+      <ul>
+        <li><strong>Your birthday</strong> — used to calculate weeks lived and power the week grid</li>
+        <li><strong>Life expectancy setting</strong> — used to determine the total grid span</li>
+        <li><strong>Notification preferences</strong> — day, time, and tone you select</li>
+        <li><strong>Theme preference</strong> — your chosen visual appearance</li>
+        <li><strong>Onboarding completion state</strong> — to avoid showing the intro repeatedly</li>
+      </ul>
+      <p>This data never leaves your device unless you use iOS system backup (iCloud Backup), which is governed by Apple's own Privacy Policy.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">04</span> Notifications</h3>
+      <p>If you enable notifications, the App will request iOS permission to send local push notifications. These notifications are generated entirely on-device using pre-written message pools — no network request is made to send or schedule them. You can revoke notification permission at any time in iOS Settings → Notifications → Lifeline Weeks.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">05</span> Widgets</h3>
+      <p>The Lifeline Weeks home screen widget reads data from the shared App Group container stored locally on your device. It does not connect to the internet or any external service. Widget data refreshes at midnight each day or when the main app triggers a reload.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">06</span> In-App Purchases</h3>
+      <p>Premium theme purchases are processed entirely through Apple's App Store and StoreKit framework. We do not have access to your payment information, Apple ID, or purchase history. All billing is handled by Apple subject to Apple's Privacy Policy and Terms of Service.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">07</span> Third-Party Services</h3>
+      <p>Lifeline Weeks does not integrate any third-party SDKs, analytics platforms, advertising networks, or crash-reporting tools. There are no third parties that receive data from this App.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">08</span> Children's Privacy</h3>
+      <p>The App is suitable for users of all ages. Because we do not collect any personal data whatsoever, there are no special risks for children. We do not knowingly collect information from any user, of any age.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">09</span> Changes to This Policy</h3>
+      <p>If we ever materially change this Privacy Policy, we will update the effective date above. Any changes will be posted at this URL. Continued use of the App after changes constitutes acceptance of the updated policy.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">10</span> Contact</h3>
+      <p>If you have any questions about this Privacy Policy, please contact us:</p>
+    </div>
+
+    <div class="contact-card">
+      <div class="contact-card-left">
+        <h4>Cuong Sam Manh</h4>
+        <p>Developer of Lifeline Weeks · Happy to answer any question</p>
+      </div>
+      <a href="mailto:Manhcuong531@gmail.com" class="contact-link">
+        ✉ Manhcuong531@gmail.com
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ TERMS OF USE ═══════════════════════════════ -->
+  <div class="section" id="section-terms">
+    <div class="doc-header">
+      <h2>Terms of Use</h2>
+      <p class="doc-meta">Effective date: March 24, 2026 &nbsp;·&nbsp; Lifeline Weeks iOS App</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">01</span> Acceptance of Terms</h3>
+      <p>By downloading, installing, or using Lifeline Weeks (the "App"), you agree to be bound by these Terms of Use. If you do not agree, please do not use the App. These terms apply to all users of the App.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">02</span> License Grant</h3>
+      <p>Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to use the App on any Apple-branded device that you own or control, solely for your personal, non-commercial purposes.</p>
+      <p>This license does not include the right to:</p>
+      <ul>
+        <li>Copy, modify, or distribute the App or its content</li>
+        <li>Reverse-engineer, decompile, or disassemble any part of the App</li>
+        <li>Rent, lease, sell, or sublicense the App</li>
+        <li>Remove any copyright, trademark, or other proprietary notices</li>
+      </ul>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">03</span> Intellectual Property</h3>
+      <p>All content within Lifeline Weeks — including but not limited to the App's design, graphics, week-grid visualization, notification messages, copy, icons, and source code — is the exclusive intellectual property of Cuong Sam Manh and is protected by applicable copyright and intellectual property laws. All rights are reserved.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">04</span> Premium Features and In-App Purchases</h3>
+      <p>The App offers optional premium theme unlocks via a one-time in-app purchase through Apple's App Store.</p>
+      <ul>
+        <li>All purchases are final and processed by Apple. We do not issue refunds directly — refund requests must be submitted to Apple through their standard process.</li>
+        <li>Premium themes are tied to your Apple ID and can be restored on any device signed into the same Apple ID via the "Restore Purchases" option.</li>
+        <li>We reserve the right to modify, discontinue, or change the pricing of premium features at any time with reasonable notice.</li>
+      </ul>
+      <div class="highlight-box">
+        All core features — the week grid, notifications, and widgets — are and will remain completely free.
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">05</span> User Responsibilities</h3>
+      <p>You agree to use the App only for lawful purposes and in a manner consistent with these Terms. You are responsible for:</p>
+      <ul>
+        <li>Ensuring the accuracy of the personal information you enter (e.g., your birthday)</li>
+        <li>Maintaining appropriate backups of your device data</li>
+        <li>Not attempting to circumvent, disable, or interfere with any security features of the App</li>
+      </ul>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">06</span> Disclaimer of Warranties</h3>
+      <p>The App is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind, either express or implied. We do not warrant that the App will be error-free, uninterrupted, or free of bugs or viruses.</p>
+      <div class="warn-box">
+        The App is intended as a reflective tool to promote intentional living. Week counts and projections are estimates based on the information you provide and the ISO calendar standard. They are not medical, psychological, or actuarial advice.
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">07</span> Limitation of Liability</h3>
+      <p>To the fullest extent permitted by applicable law, Cuong Sam Manh shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the App, even if advised of the possibility of such damages.</p>
+      <p>Our total liability to you for any claim arising from these Terms or the App shall not exceed the amount you paid for the App or its in-app purchases in the twelve (12) months preceding the claim.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">08</span> App Store Terms</h3>
+      <p>Your use of Lifeline Weeks is also subject to Apple's App Store Terms of Service, which are incorporated herein by reference. In the event of a conflict between these Terms and Apple's terms, Apple's terms shall govern where applicable. Apple is not responsible for the App or its content.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">09</span> Termination</h3>
+      <p>We reserve the right to terminate or suspend your access to the App at any time, for any reason, without notice. Upon termination, your license to use the App will immediately cease. Provisions of these Terms that by their nature should survive termination shall survive, including intellectual property rights, disclaimers, and limitations of liability.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">10</span> Governing Law</h3>
+      <p>These Terms shall be governed by and construed in accordance with the laws of Vietnam, without regard to its conflict of law provisions. Any disputes arising from these Terms or your use of the App shall be subject to the exclusive jurisdiction of the courts located in Vietnam.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">11</span> Changes to These Terms</h3>
+      <p>We may update these Terms from time to time. When we do, we will update the effective date at the top of this page. Your continued use of the App after changes are posted constitutes your acceptance of the revised Terms.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3><span class="num">12</span> Contact</h3>
+      <p>Questions about these Terms? We're happy to help:</p>
+    </div>
+
+    <div class="contact-card">
+      <div class="contact-card-left">
+        <h4>Cuong Sam Manh</h4>
+        <p>Developer of Lifeline Weeks · Typically responds within 48 hours</p>
+      </div>
+      <a href="mailto:Manhcuong531@gmail.com" class="contact-link">
+        ✉ Manhcuong531@gmail.com
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>© 2026 Cuong Sam Manh · Lifeline Weeks &nbsp;·&nbsp; <a href="mailto:Manhcuong531@gmail.com">Manhcuong531@gmail.com</a></p>
+  <p style="margin-top:0.4rem">Built with intention. Every week counts.</p>
+</footer>
+
+<script>
+  // ── Tab switching ──
+  function switchTab(tab) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('section-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Build nav logo ──
+  const navLogo = document.getElementById('navLogo');
+  for (let i = 0; i < 25; i++) {
+    const s = document.createElement('span');
+    if (i < 12) s.style.background = 'rgba(74,144,217,0.7)';
+    else if (i === 12) { s.style.background = '#4a90d9'; s.style.boxShadow = '0 0 4px #4a90d9'; }
+    else s.style.background = 'rgba(255,255,255,0.06)';
+    navLogo.appendChild(s);
+  }
+
+  // ── Build hero grid ──
+  const heroGrid = document.getElementById('heroGrid');
+  const total = 4000;
+  const lived = Math.floor(total * 0.32);
+  for (let i = 0; i < total; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'hero-grid-cell';
+    if (i < lived) {
+      cell.classList.add('lived');
+      if (i % 52 === 0) cell.classList.add('milestone');
+    } else if (i === lived) {
+      cell.classList.add('current');
+    } else {
+      cell.classList.add('future');
+    }
+    heroGrid.appendChild(cell);
+  }
+</script>
+</body>
+</html>
