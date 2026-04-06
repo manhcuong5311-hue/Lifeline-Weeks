@@ -42,8 +42,8 @@ struct LifeCalculator {
         let now         = Date()
         let birthMonday = mondayOfWeek(containing: birthDate, calendar: calendar)
         let nowMonday   = mondayOfWeek(containing: now, calendar: calendar)
-        let components  = calendar.dateComponents([.weekOfYear], from: birthMonday, to: nowMonday)
-        return max(components.weekOfYear ?? 0, 0)
+        let components  = calendar.dateComponents([.day], from: birthMonday, to: nowMonday)
+        return max((components.day ?? 0) / 7, 0)
     }
 
     nonisolated static func totalWeeks(lifeExpectancyYears: Int) -> Int { lifeExpectancyYears * 52 }

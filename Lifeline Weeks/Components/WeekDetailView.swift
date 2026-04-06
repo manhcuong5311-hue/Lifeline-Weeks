@@ -65,12 +65,15 @@ struct WeekDetailView: View {
     }
 
     private var ageContext: String {
-        let years  = week.index / 52
-        let weekNo = (week.index % 52) + 1
+        let calendar  = Calendar.current
+        let age       = max(0, calendar.dateComponents([.year], from: birthDate, to: week.startDate).year ?? 0)
+        let yearStart = calendar.date(byAdding: .year, value: age, to: birthDate) ?? birthDate
+        let dayInYear = calendar.dateComponents([.day], from: yearStart, to: week.startDate).day ?? 0
+        let weekInYear = dayInYear / 7 + 1
         switch week.state {
-        case .past:    return "Age \(years) · Week \(weekNo) of that year"
-        case .current: return "Age \(years) · Week \(weekNo) of this year"
-        case .future:  return "Age \(years) · Week \(weekNo) of that year"
+        case .past:    return "Age \(age) · Week \(weekInYear) of that year"
+        case .current: return "Age \(age) · Week \(weekInYear) of this year"
+        case .future:  return "Age \(age) · Week \(weekInYear) of that year"
         }
     }
 
