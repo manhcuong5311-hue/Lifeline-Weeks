@@ -8,7 +8,6 @@ struct HomeView: View {
 
     @State private var scrollTrigger       = false
     @State private var celebrationBanner:  String?
-    @State private var showDailyPaywall    = false
 
     private var theme: AppTheme { themeManager.current }
 
@@ -32,6 +31,7 @@ struct HomeView: View {
                 Group {
                     if viewModel.hasConfigured {
                         mainContent
+                            .adBannerInset()
                     } else {
                         OnboardingView()
                     }
@@ -54,40 +54,14 @@ struct HomeView: View {
         .onChange(of: systemColorScheme) { _, scheme in
             themeManager.updateSystemScheme(scheme)
         }
-        // Returning user: hasConfigured is already true when the view appears
+        // Consent / ATT / ads start only once the life grid is on screen —
+        // never during onboarding.
         .onAppear {
-            if viewModel.hasConfigured { triggerDailyPaywall() }
+            if viewModel.hasConfigured { AdsManager.shared.activate() }
         }
-        // New user: hasConfigured flips true after onboarding completes
         .onChange(of: viewModel.hasConfigured) { _, configured in
-            if configured { triggerDailyPaywall() }
+            if configured { AdsManager.shared.activate() }
         }
-        .sheet(isPresented: $showDailyPaywall) {
-            PaywallView()
-                .environmentObject(viewModel)
-        }
-    }
-
-    // MARK: - Daily paywall
-
-    private func triggerDailyPaywall() {
-        guard !viewModel.isPremium else { return }
-        guard shouldShowPaywallToday() else { return }
-        Task {
-            try? await Task.sleep(for: .seconds(1.2))
-            showDailyPaywall = true
-        }
-    }
-
-    private func shouldShowPaywallToday() -> Bool {
-        let key   = "paywall.lastShownDate"
-        let today = Calendar.current.startOfDay(for: Date())
-        if let stored = UserDefaults.standard.object(forKey: key) as? Date,
-           Calendar.current.isDate(stored, inSameDayAs: today) {
-            return false
-        }
-        UserDefaults.standard.set(today, forKey: key)
-        return true
     }
 
     // MARK: - Main content

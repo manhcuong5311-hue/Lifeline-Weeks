@@ -1,8 +1,10 @@
 import SwiftUI
 import StoreKit
 
-struct PaywallView: View {
-    @EnvironmentObject private var viewModel: LifeViewModel
+/// The only purchase in Lifeline Weeks: a one-time "Remove Ads".
+/// Every feature (all themes included) is free; this only turns ads off.
+struct RemoveAdsSheet: View {
+    @ObservedObject private var adFree = AdFreeStatus.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var isPurchasing   = false
@@ -10,6 +12,22 @@ struct PaywallView: View {
     @State private var appeared       = false
     @State private var product:        Product? = nil
     @State private var purchaseError:  String?  = nil
+
+    private struct Benefit: Identifiable {
+        let id = UUID()
+        let icon: String
+        let title: String
+        let detail: String
+    }
+
+    private let benefits: [Benefit] = [
+        Benefit(icon: "eye.slash.fill", title: "No ads",
+                detail: "No banner or full-screen ads, ever"),
+        Benefit(icon: "infinity", title: "One-time purchase",
+                detail: "No subscription. Yours forever"),
+        Benefit(icon: "heart.fill", title: "Support the app",
+                detail: "Helps an indie developer keep building")
+    ]
 
     var body: some View {
         ZStack {
@@ -26,7 +44,7 @@ struct PaywallView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: DS.Spacing.xxl) {
                         heroSection
-                        featureList
+                        benefitList
                         Spacer(minLength: DS.Spacing.xl)
                     }
                     .padding(.horizontal, DS.Spacing.l)
@@ -56,15 +74,19 @@ struct PaywallView: View {
 
     private var heroSection: some View {
         VStack(spacing: DS.Spacing.m) {
-            Text("See your life\nclearly.")
+            Image(systemName: "nosign")
+                .font(.system(size: 44, weight: .semibold))
+                .foregroundStyle(Color.accentColor)
+                .opacity(appeared ? 1 : 0)
+
+            Text("Remove Ads")
                 .font(.system(size: 38, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
-                .lineSpacing(2)
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 20)
 
-            Text("Unlock the full experience.\nEvery week, every milestone, every moment.")
+            Text("Every feature and every theme is free.\nRemove ads once and keep your life view calm.")
                 .font(.system(size: 16, design: .rounded))
                 .foregroundStyle(.white.opacity(0.5))
                 .multilineTextAlignment(.center)
@@ -74,11 +96,11 @@ struct PaywallView: View {
         .animation(.easeOut(duration: 0.55), value: appeared)
     }
 
-    private var featureList: some View {
+    private var benefitList: some View {
         VStack(spacing: 0) {
-            ForEach(Array(PremiumFeature.allCases.enumerated()), id: \.element) { i, feature in
-                featureRow(feature, delay: Double(i) * 0.08)
-                if feature != PremiumFeature.allCases.last {
+            ForEach(Array(benefits.enumerated()), id: \.element.id) { i, benefit in
+                benefitRow(benefit, delay: Double(i) * 0.08)
+                if i < benefits.count - 1 {
                     Divider()
                         .background(Color.white.opacity(0.08))
                         .padding(.leading, 56)
@@ -93,22 +115,22 @@ struct PaywallView: View {
         )
     }
 
-    private func featureRow(_ feature: PremiumFeature, delay: Double) -> some View {
+    private func benefitRow(_ benefit: Benefit, delay: Double) -> some View {
         HStack(spacing: DS.Spacing.l) {
             ZStack {
                 Circle()
                     .fill(Color.accentColor.opacity(0.15))
                     .frame(width: 36, height: 36)
-                Image(systemName: feature.systemImage)
+                Image(systemName: benefit.icon)
                     .font(.system(size: 16))
                     .foregroundStyle(Color.accentColor)
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(feature.rawValue)
+                Text(benefit.title)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                Text(feature.description)
+                Text(benefit.detail)
                     .font(.system(size: 13, design: .rounded))
                     .foregroundStyle(.white.opacity(0.45))
             }
@@ -128,34 +150,33 @@ struct PaywallView: View {
 
     private var ctaSection: some View {
         VStack(spacing: DS.Spacing.m) {
-            // Live price from App Store Connect (falls back to em-dash while loading)
-            Group {
-                if let p = product {
-                    Text("\(p.displayPrice)  ·  One-time purchase, forever")
-                } else {
-                    Text("—  ·  One-time purchase, forever")
-                }
-            }
-            .font(.system(size: 13, design: .rounded))
-            .foregroundStyle(.white.opacity(0.4))
-
-            // Primary CTA
-            Button(action: purchase) {
-                ZStack {
-                    if isPurchasing {
-                        ProgressView().tint(.white)
-                    } else {
-                        Text("Unlock Full Life View")
-                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+            if adFree.isAdFree {
+                Label("You're ad-free. Thank you!", systemImage: "checkmark.seal.fill")
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 17)
+                    .background(Color.white.opacity(0.08),
+                                in: RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous))
+            } else {
+                // Primary CTA — live price from App Store Connect
+                Button(action: purchase) {
+                    ZStack {
+                        if isPurchasing {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text(product.map { "Remove Ads — \($0.displayPrice)" } ?? "Remove Ads")
+                                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        }
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 17)
+                    .background(product == nil ? Color.accentColor.opacity(0.5) : Color.accentColor)
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous))
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 17)
-                .background(product == nil ? Color.accentColor.opacity(0.5) : Color.accentColor)
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous))
+                .disabled(isPurchasing || isRestoring || product == nil)
             }
-            .disabled(isPurchasing || isRestoring || product == nil)
 
             // Inline error (shown only when purchase/restore fails)
             if let err = purchaseError {
@@ -167,7 +188,7 @@ struct PaywallView: View {
             }
 
             // Apple ID purchase description
-            Text("Payment will be charged to your Apple ID at confirmation. This is a one-time purchase — no subscription, no recurring charges, no expiry. Yours forever.")
+            Text("One-time payment charged to your Apple ID at confirmation. No subscription, no recurring charges.")
                 .font(.system(size: 11, design: .rounded))
                 .foregroundStyle(.white.opacity(0.3))
                 .multilineTextAlignment(.center)
@@ -209,7 +230,6 @@ struct PaywallView: View {
                 isPurchasing = false
                 if ok {
                     HapticFeedback.success()
-                    viewModel.isPremium = true
                     dismiss()
                 }
             } catch StoreError.purchasePending {
@@ -233,7 +253,6 @@ struct PaywallView: View {
             isRestoring = false
             if ok {
                 HapticFeedback.success()
-                viewModel.isPremium = true
                 dismiss()
             } else {
                 purchaseError = "No previous purchase found on this Apple ID."
@@ -246,6 +265,6 @@ struct PaywallView: View {
 
 #Preview {
     Color.clear.sheet(isPresented: .constant(true)) {
-        PaywallView().environmentObject(LifeViewModel())
+        RemoveAdsSheet()
     }
 }

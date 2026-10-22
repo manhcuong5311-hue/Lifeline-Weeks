@@ -18,8 +18,11 @@ struct Lifeline_WeeksApp: App {
         // Reschedule notifications with latest profile data
         NotificationService.rescheduleIfNeeded()
 
-        // Re-verify entitlement against App Store on every cold launch
+        // Re-verify the Remove Ads entitlement against the App Store on every cold launch
         Task { await PremiumService.verifyEntitlement() }
+
+        // Ads run only while "Remove Ads" is not owned
+        AdsManager.shared.bind(isAdFree: AdFreeStatus.shared.$isAdFree)
     }
 
     var body: some Scene {

@@ -13,10 +13,6 @@ enum AppThemeStyle: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var isPremium: Bool {
-        switch self { case .midnight, .beige, .amoled: return true; default: return false }
-    }
-
     var symbolName: String {
         switch self {
         case .dark:     return "moon.fill"

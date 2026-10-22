@@ -1,18 +1,19 @@
 import Foundation
 import StoreKit
 
+import Combine
+
 // ─────────────────────────────────────────────────────────────────────────────
 // MARK: - Product ID
 // ─────────────────────────────────────────────────────────────────────────────
-// ⚠️  Must match EXACTLY what you created in App Store Connect
-//     App Store Connect → Your App → In-App Purchases
-//     Type: Non-Consumable (one-time purchase, NOT subscription)
-//     Product ID: com.samcorp.lifeweeks.lifetime
-// Bundle ID: com.SamCorp.Lifeline-Weeks
+// Since 1.2 every feature is free and the app shows AdMob ads. The former
+// lifetime "Premium" unlock is reused as the one-time "Remove Ads" purchase,
+// so everyone who bought it before is ad-free automatically.
+//     Type: Non-Consumable · Product ID: com.samcorp.lifeweeks.lifetime
 // ─────────────────────────────────────────────────────────────────────────────
 
 enum ProductID {
-    static let lifetime = "com.samcorp.lifeweeks.lifetime"   // Non-Consumable in App Store Connect
+    static let lifetime = "com.samcorp.lifeweeks.lifetime"   // "Remove Ads" in App Store Connect
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,21 +37,38 @@ enum StoreError: LocalizedError {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// MARK: - AdFreeStatus  (observable mirror for SwiftUI + AdsManager)
+// ─────────────────────────────────────────────────────────────────────────────
+
+@MainActor
+final class AdFreeStatus: ObservableObject {
+    static let shared = AdFreeStatus()
+    @Published private(set) var isAdFree = PremiumService.isAdFree
+
+    fileprivate func refresh() {
+        if isAdFree != PremiumService.isAdFree { isAdFree = PremiumService.isAdFree }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // MARK: - PremiumService  (full StoreKit 2)
 // ─────────────────────────────────────────────────────────────────────────────
 
 struct PremiumService {
 
-    // MARK: - Persisted entitlement (fast read for UI gating)
+    // MARK: - Persisted entitlement (fast read)
 
+    /// Key kept from the Premium era so former buyers stay ad-free.
     private static let premiumKey = "life.isPremium"
 
-    static var isPremium: Bool {
+    /// True once "Remove Ads" (the former lifetime unlock) is owned.
+    static var isAdFree: Bool {
         get { UserDefaults.standard.bool(forKey: premiumKey) }
-        set { UserDefaults.standard.set(newValue, forKey: premiumKey) }
+        set {
+            UserDefaults.standard.set(newValue, forKey: premiumKey)
+            Task { @MainActor in AdFreeStatus.shared.refresh() }
+        }
     }
-
-    static func isUnlocked(_ feature: PremiumFeature) -> Bool { isPremium }
 
     // ─────────────────────────────────────────────────────────────────────────
     // MARK: - Fetch product
@@ -83,7 +101,7 @@ struct PremiumService {
         switch result {
         case .success(let verification):
             let transaction = try checkVerified(verification)
-            isPremium = true
+            isAdFree = true
             await transaction.finish()
             return true
 
@@ -98,7 +116,7 @@ struct PremiumService {
         }
     }
 
-    /// Completion-handler bridge — backward-compatible with existing PaywallView.
+    /// Completion-handler bridge.
     static func purchase(completion: @escaping @MainActor (Bool) -> Void) {
         Task { @MainActor in
             do {
@@ -140,10 +158,10 @@ struct PremiumService {
     // MARK: - Entitlement verification  (call on every launch)
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// Walks `Transaction.currentEntitlements`. Updates `isPremium` as a side
+    /// Walks `Transaction.currentEntitlements`. Updates `isAdFree` as a side
     /// effect. Returns `true` when an unrevoked lifetime entitlement is found.
     ///
-    /// For a non-consumable one-time purchase we only set isPremium = false
+    /// For a non-consumable one-time purchase we only set isAdFree = false
     /// when the transaction has been explicitly REVOKED (refunded by Apple).
     /// We never revoke just because nothing is found — the user may be offline.
     @discardableResult
@@ -159,7 +177,7 @@ struct PremiumService {
                 // Apple issued a refund — revoke access
                 foundRevoked = true
             } else {
-                isPremium = true
+                isAdFree = true
                 return true
             }
         }
@@ -167,7 +185,7 @@ struct PremiumService {
         // Only revoke if we positively found a revoked transaction.
         // If entitlements are empty (offline / first launch), keep stored value.
         if foundRevoked {
-            isPremium = false
+            isAdFree = false
         }
         return false
     }
@@ -187,7 +205,7 @@ struct PremiumService {
                     if await tx.productID == ProductID.lifetime {
                         // Non-consumable: grant on purchase, revoke only on refund
                         let revoked = tx.revocationDate != nil
-                        await MainActor.run { isPremium = !revoked }
+                        await MainActor.run { isAdFree = !revoked }
                     }
                     await tx.finish()
                 } catch {

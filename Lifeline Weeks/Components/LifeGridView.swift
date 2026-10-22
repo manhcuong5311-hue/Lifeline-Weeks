@@ -48,7 +48,7 @@ struct LifeGridView: View {
                     .onChange(of: geo.size.width) { _, w in availableWidth = w }
             }
         )
-        .sheet(item: $selectedWeek) { week in
+        .sheet(item: $selectedWeek, onDismiss: { AdsManager.shared.recordAction() }) { week in
             WeekDetailView(week: week, birthDate: birthDate)
         }
     }

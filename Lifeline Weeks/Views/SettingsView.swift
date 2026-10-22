@@ -3,11 +3,13 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var viewModel:     LifeViewModel
     @EnvironmentObject private var themeManager:  ThemeManager
+    @ObservedObject private var adFree = AdFreeStatus.shared
+    @ObservedObject private var ads    = AdsManager.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var birthDate              = Date()
     @State private var lifeExpectancy         = 90
-    @State private var showPaywall             = false
+    @State private var showRemoveAds           = false
     @State private var showResetConfirm        = false
     @State private var showNotificationPreview = false
     @State private var showFAQ                 = false
@@ -22,7 +24,7 @@ struct SettingsView: View {
                 appearanceSection
                 lifeSection
                 notificationsSection
-                if !viewModel.isPremium { premiumSection }
+                removeAdsSection
                 aboutSection
                 resetSection
             }
@@ -39,7 +41,7 @@ struct SettingsView: View {
             birthDate      = viewModel.birthDate
             lifeExpectancy = viewModel.lifeExpectancy
         }
-        .sheet(isPresented: $showPaywall) { PaywallView() }
+        .sheet(isPresented: $showRemoveAds) { RemoveAdsSheet() }
         .sheet(isPresented: $showWidgetGuide) { WidgetGuideView() }
         .sheet(isPresented: $showFAQ) {
             FAQView(theme: theme)
@@ -150,15 +152,7 @@ struct SettingsView: View {
                             ThemeSwatchCell(
                                 style:       style,
                                 isSelected:  themeManager.themeStyle == style,
-                                isPremium:   style.isPremium,
-                                isUnlocked:  viewModel.isPremium || !style.isPremium,
-                                onTap: {
-                                    if style.isPremium && !viewModel.isPremium {
-                                        showPaywall = true
-                                    } else {
-                                        themeManager.setTheme(style)
-                                    }
-                                }
+                                onTap:       { themeManager.setTheme(style) }
                             )
                         }
                     }
@@ -331,28 +325,29 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Premium section
+    // MARK: - Remove Ads section
 
-    private var premiumSection: some View {
+    private var removeAdsSection: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.m) {
-            sectionHeader("Premium")
+            sectionHeader("Ads")
 
-            Button { showPaywall = true } label: {
+            Button { showRemoveAds = true } label: {
                 HStack(spacing: DS.Spacing.m) {
                     ZStack {
                         RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous)
                             .fill(theme.accentGradient)
                             .frame(width: 40, height: 40)
-                        Image(systemName: "crown.fill")
+                        Image(systemName: adFree.isAdFree ? "checkmark.seal.fill" : "nosign")
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(.white)
                     }
 
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Unlock Premium")
+                        Text(adFree.isAdFree ? "Ad-free" : "Remove Ads")
                             .font(.lifeSubhead)
                             .foregroundStyle(theme.textPrimary)
-                        Text("Midnight, Beige & AMOLED themes")
+                        Text(adFree.isAdFree ? "Thanks for supporting Lifeline Weeks"
+                                             : "One-time purchase · no subscription")
                             .font(.lifeCaption)
                             .foregroundStyle(theme.textSecondary)
                     }
@@ -367,6 +362,26 @@ struct SettingsView: View {
                 .settingsCard(theme: theme)
             }
             .buttonStyle(.plain)
+
+            // EEA/UK users must be able to revisit their ad consent.
+            if ads.privacyOptionsRequired && !adFree.isAdFree {
+                Button { ads.presentPrivacyOptions() } label: {
+                    HStack(spacing: DS.Spacing.m) {
+                        Image(systemName: "hand.raised.fill")
+                            .foregroundStyle(theme.textSecondary)
+                        Text("Ad privacy choices")
+                            .font(.lifeSubhead)
+                            .foregroundStyle(theme.textPrimary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(theme.textTertiary)
+                    }
+                    .padding(DS.Spacing.l)
+                    .settingsCard(theme: theme)
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 
@@ -582,8 +597,6 @@ struct SettingsView: View {
 private struct ThemeSwatchCell: View {
     let style:      AppThemeStyle
     let isSelected: Bool
-    let isPremium:  Bool
-    let isUnlocked: Bool
     let onTap:      () -> Void
 
     private var swatchTheme: AppTheme {
@@ -617,20 +630,6 @@ private struct ThemeSwatchCell: View {
                         }
                     }
 
-                    // Lock badge (premium, not unlocked)
-                    if isPremium && !isUnlocked {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "lock.fill")
-                                    .font(.system(size: 9, weight: .semibold))
-                                    .foregroundStyle(.white.opacity(0.7))
-                                    .padding(4)
-                            }
-                            Spacer()
-                        }
-                    }
-
                     // System icon
                     if style == .system {
                         Image(systemName: "circle.lefthalf.filled")
@@ -659,7 +658,6 @@ private struct ThemeSwatchCell: View {
             }
         }
         .buttonStyle(.plain)
-        .opacity(isPremium && !isUnlocked ? 0.7 : 1.0)
     }
 }
 
@@ -875,7 +873,7 @@ fileprivate let faqItems: [FAQItem] = {
     let group2: [FAQItem] = [
         FAQItem(
             question: "Is my data private?",
-            answer: "Yes. Your birthday and life expectancy are stored only on your device. Nothing is sent to any server. The app has no account system and collects no personal data."
+            answer: "Yes. Your name, birthday and life expectancy are stored only on your device and are never sent to us or to anyone else. There is no account system. The app shows ads from Google AdMob, which may use your device's advertising identifier only if you allow tracking; buying Remove Ads turns ads off."
         ),
         FAQItem(
             question: "How do I change my life expectancy?",
@@ -900,12 +898,12 @@ fileprivate let faqItems: [FAQItem] = {
             answer: "Widgets refresh at midnight each day. If you recently updated your birthday, the widget reloads immediately. If it still shows old data, remove and re-add the widget from your home screen."
         ),
         FAQItem(
-            question: "What is the premium version?",
-            answer: "Premium unlocks three exclusive themes: Midnight Blue (deep navy), Warm Beige (warm paper light), and AMOLED Black (pure black for OLED screens). All core features — grid, notifications, widgets — are completely free."
+            question: "Is Lifeline Weeks free?",
+            answer: "Yes. Every feature — the grid, all six themes, notifications and widgets — is free. The app shows ads; a one-time Remove Ads purchase turns them off for good. If you bought the old Premium unlock, you're already ad-free."
         ),
         FAQItem(
             question: "How do I change the theme?",
-            answer: "Settings → Appearance. Choose from System (follows iOS auto), Light, Dark, or three premium themes. Tap any swatch to switch with an animated transition."
+            answer: "Settings → Appearance. Choose from System (follows iOS auto), Light, Dark, Midnight, Beige or AMOLED. Tap any swatch to switch with an animated transition."
         ),
         FAQItem(
             question: "What is the notification tone?",

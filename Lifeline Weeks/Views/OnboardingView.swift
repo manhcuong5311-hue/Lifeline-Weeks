@@ -189,7 +189,7 @@ struct OnboardingView: View {
             HStack(spacing: 4) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 10))
-                Text("Your data is stored on this device only. We never collect or share it.")
+                Text("Your name and birthday stay on this device. We never see them.")
                     .font(.system(size: 11, design: .rounded))
                     .multilineTextAlignment(.center)
             }

@@ -20,14 +20,6 @@ final class LifeViewModel: ObservableObject {
 
     @Published private(set) var hasConfigured: Bool = false  // use hasConfigured_reset() to clear
 
-    // MARK: - Premium
-
-    @Published var isPremium: Bool = PremiumService.isPremium {
-        didSet { PremiumService.isPremium = isPremium }
-    }
-
-    func isUnlocked(_ feature: PremiumFeature) -> Bool { PremiumService.isUnlocked(feature) }
-
     // MARK: - Notifications
 
     @Published var notificationsEnabled: Bool = NotificationService.isEnabled {
